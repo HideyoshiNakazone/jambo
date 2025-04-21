@@ -4,7 +4,7 @@ from jambo.parser._type_parser import GenericTypeParser
 class FloatTypeParser(GenericTypeParser):
     mapped_type = float
 
-    json_schema_type = "number"
+    json_schema_type = "type:number"
 
     type_mappings = {
         "minimum": "ge",
@@ -15,7 +15,7 @@ class FloatTypeParser(GenericTypeParser):
         "default": "default",
     }
 
-    def from_properties(self, name, properties, required=False):
+    def from_properties(self, name, properties, required=False, **kwargs):
         mapped_properties = self.mappings_properties_builder(properties, required)
 
         default_value = mapped_properties.get("default")

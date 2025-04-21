@@ -4,7 +4,7 @@ from jambo.parser._type_parser import GenericTypeParser
 class IntTypeParser(GenericTypeParser):
     mapped_type = int
 
-    json_schema_type = "integer"
+    json_schema_type = "type:integer"
 
     type_mappings = {
         "minimum": "ge",
@@ -15,7 +15,7 @@ class IntTypeParser(GenericTypeParser):
         "default": "default",
     }
 
-    def from_properties(self, name, properties, required=False):
+    def from_properties(self, name, properties, required=False, **kwargs):
         mapped_properties = self.mappings_properties_builder(properties, required)
 
         default_value = mapped_properties.get("default")

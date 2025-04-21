@@ -10,7 +10,7 @@ V = TypeVar("V")
 class ArrayTypeParser(GenericTypeParser):
     mapped_type = list
 
-    json_schema_type = "array"
+    json_schema_type = "type:array"
 
     default_mappings = {"description": "description"}
 
@@ -19,10 +19,10 @@ class ArrayTypeParser(GenericTypeParser):
         "minItems": "min_length",
     }
 
-    def from_properties(self, name, properties, required=False):
-        _item_type, _item_args = GenericTypeParser.get_impl(
-            properties["items"]["type"]
-        ).from_properties(name, properties["items"], required=True)
+    def from_properties(self, name, properties, required=False, **kwargs):
+        _item_type, _item_args = GenericTypeParser.type_from_properties(
+            name, properties["items"], required=True
+        )
 
         wrapper_type = set if properties.get("uniqueItems", False) else list
         field_type = wrapper_type[_item_type]

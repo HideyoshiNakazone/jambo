@@ -11,7 +11,7 @@ class AnyOfTypeParser(GenericTypeParser):
 
     json_schema_type = "anyOf"
 
-    def from_properties(self, name, properties, required=False):
+    def from_properties(self, name, properties, required=False, **kwargs):
         if "anyOf" not in properties:
             raise ValueError(f"Invalid JSON Schema: {properties}")
 
@@ -23,8 +23,8 @@ class AnyOfTypeParser(GenericTypeParser):
         subProperties = properties["anyOf"]
 
         sub_types = [
-            GenericTypeParser.get_impl(subProperty["type"]).from_properties(
-                name, subProperty
+            GenericTypeParser.type_from_properties(
+                name, subProperty, required=required, **kwargs
             )
             for subProperty in subProperties
         ]
@@ -50,6 +50,6 @@ class AnyOfTypeParser(GenericTypeParser):
         # By defining the type as Union of Annotated type we can use the Field validator
         # to enforce the constraints of each union type when needed.
         # We use Annotated to attach the Field validators to the type.
-        field_types = [Annotated[t, Field(**v)] if v else t for t, v in sub_types]
+        field_types = [Annotated[t, Field(**v)] for t, v in sub_types]
 
         return Union[(*field_types,)], mapped_properties

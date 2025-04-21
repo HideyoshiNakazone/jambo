@@ -52,45 +52,28 @@ class SchemaConverter:
                 f"Invalid JSON Schema: {schema['type']}. Only 'object' can be converted to Pydantic models."
             )
 
-        return SchemaConverter._build_model_from_properties(
-            name, schema["properties"], schema.get("required", [])
+        properties = SchemaConverter._parse_properties(
+            schema["properties"], required_keys=schema.get("required", [])
         )
 
-    @staticmethod
-    def _build_model_from_properties(
-        model_name: str, model_properties: dict, required_keys: list[str]
-    ) -> ModelT:
-        properties = SchemaConverter._parse_properties(model_properties, required_keys)
-
-        return create_model(model_name, **properties)
+        return create_model(name, **properties)
 
     @staticmethod
     def _parse_properties(
-        properties: dict, required_keys=None
+        properties: dict, root_properties={}, required_keys=None
     ) -> dict[str, tuple[type, Field]]:
         required_keys = required_keys or []
 
         fields = {}
         for name, prop in properties.items():
-            is_required = name in required_keys
-            fields[name] = SchemaConverter._build_field(name, prop, is_required)
+            is_field_required = name in required_keys
+
+            field_type, field_validators = GenericTypeParser.type_from_properties(
+                name,
+                prop,
+                required=is_field_required,
+                context=root_properties,
+            )
+            fields[name] = (field_type, Field(**field_validators))
 
         return fields
-
-    @staticmethod
-    def _build_field(name, properties: dict, required=False) -> tuple[type, Field]:
-        match properties:
-            case {"anyOf": _}:
-                _field_type = "anyOf"
-            case {"allOf": _}:
-                _field_type = "allOf"
-            case {"type": _}:
-                _field_type = properties["type"]
-            case _:
-                raise ValueError(f"Invalid JSON Schema: {properties}")
-
-        _field_type, _field_args = GenericTypeParser.get_impl(
-            _field_type
-        ).from_properties(name, properties, required)
-
-        return _field_type, Field(**_field_args)

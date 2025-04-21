@@ -1,4 +1,3 @@
-from urllib import parse
 from jambo.parser._type_parser import GenericTypeParser
 
 from typing import ForwardRef
@@ -9,24 +8,22 @@ class RefTypeParser(GenericTypeParser):
 
     json_schema_type = "$ref"
 
-    type_mappings = { ... }
+    type_mappings = {...}
 
-    def from_properties(self, properties, name, required=False):
+    def from_properties(self, properties, name, required=False, **kwargs):
         if "$ref" not in properties:
-            raise ValueError(
-                f"RefTypeParser: Missing $ref in properties for {name}"
-            )
-        
+            raise ValueError(f"RefTypeParser: Missing $ref in properties for {name}")
+
         if "$context" not in properties:
             raise RuntimeError(
                 f"RefTypeParser: Missing $content in properties for {name}"
             )
-        
+
         if not properties["$ref"].startswith("#"):
             raise ValueError(
                 "At the moment, only local references are supported. Look into $defs and # for recursive references."
             )
-        
+
         ref_type = None
         mapped_properties = dict()
 
@@ -35,7 +32,7 @@ class RefTypeParser(GenericTypeParser):
                 raise ValueError(
                     "RefTypeParser: Missing title in properties for $ref #"
                 )
-            
+
             ref_type = ForwardRef(properties["$context"]["title"])
 
         elif properties["$ref"].startswith("#/$defs/"):
@@ -47,20 +44,16 @@ class RefTypeParser(GenericTypeParser):
                     )
                 target_property = target_property[prop_name]
 
-            if "type" not in target_property:
-
-
-            parsed_type, parsed_properties = GenericTypeParser.get_impl(
-
-            ).from_properties()
+            ref_type, mapped_properties = GenericTypeParser.type_from_properties(
+                prop_name, target_property, **kwargs
+            )
 
         else:
             raise ValueError(
                 "RefTypeParser: Invalid $ref format. Only local references are supported."
             )
-        
+
         if not required:
             mapped_properties["default"] = None
 
-            
         return ref_type, mapped_properties

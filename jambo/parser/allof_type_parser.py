@@ -6,7 +6,7 @@ class AllOfTypeParser(GenericTypeParser):
 
     json_schema_type = "allOf"
 
-    def from_properties(self, name, properties, required=False):
+    def from_properties(self, name, properties, required=False, **kwargs):
         subProperties = properties.get("allOf")
         if not subProperties:
             raise ValueError("Invalid JSON Schema: 'allOf' is not specified.")
@@ -29,8 +29,8 @@ class AllOfTypeParser(GenericTypeParser):
 
         combined_properties = self._rebuild_properties_from_subproperties(subProperties)
 
-        return GenericTypeParser.get_impl(_mapped_type).from_properties(
-            name, combined_properties
+        return GenericTypeParser.type_from_properties(
+            name, combined_properties, required=required, **kwargs
         )
 
     def _rebuild_properties_from_subproperties(self, subProperties):
