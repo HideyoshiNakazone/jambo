@@ -1,6 +1,6 @@
 from jambo.parser._type_parser import GenericTypeParser
 
-from typing import ForwardRef
+from typing import ForwardRef, Union
 
 
 class RefTypeParser(GenericTypeParser):
@@ -8,13 +8,15 @@ class RefTypeParser(GenericTypeParser):
 
     json_schema_type = "$ref"
 
-    type_mappings = {...}
+    type_mappings = {}
 
-    def from_properties(self, properties, name, required=False, **kwargs):
+    def from_properties(
+        self, properties, name, context, required=False, **kwargs
+    ) -> tuple[Union[type, ForwardRef], dict]:
         if "$ref" not in properties:
             raise ValueError(f"RefTypeParser: Missing $ref in properties for {name}")
 
-        if "$context" not in properties:
+        if context is None:
             raise RuntimeError(
                 f"RefTypeParser: Missing $content in properties for {name}"
             )
@@ -28,15 +30,15 @@ class RefTypeParser(GenericTypeParser):
         mapped_properties = dict()
 
         if properties["$ref"] == "#":
-            if "title" not in properties["$context"]:
+            if "title" not in context:
                 raise ValueError(
                     "RefTypeParser: Missing title in properties for $ref #"
                 )
 
-            ref_type = ForwardRef(properties["$context"]["title"])
+            ref_type = ForwardRef(context["title"])
 
         elif properties["$ref"].startswith("#/$defs/"):
-            target_property = properties["$context"]
+            target_property = context
             for prop_name in properties["$ref"].split("/")[1:]:
                 if prop_name not in target_property:
                     raise ValueError(
@@ -45,7 +47,7 @@ class RefTypeParser(GenericTypeParser):
                 target_property = target_property[prop_name]
 
             ref_type, mapped_properties = GenericTypeParser.type_from_properties(
-                prop_name, target_property, **kwargs
+                prop_name, target_property, context=context, **kwargs
             )
 
         else:

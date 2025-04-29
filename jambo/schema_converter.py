@@ -33,6 +33,7 @@ class SchemaConverter:
     def build_object(
         name: str,
         schema: JSONSchema,
+        **kwargs,
     ) -> ModelT:
         """
         Converts a JSON Schema object to a Pydantic model given a name.
@@ -53,14 +54,14 @@ class SchemaConverter:
             )
 
         properties = SchemaConverter._parse_properties(
-            schema["properties"], required_keys=schema.get("required", [])
+            schema["properties"], required_keys=schema.get("required", []), **kwargs
         )
 
         return create_model(name, **properties)
 
     @staticmethod
     def _parse_properties(
-        properties: dict, root_properties={}, required_keys=None
+        properties: dict, root_properties={}, required_keys=None, **kwargs
     ) -> dict[str, tuple[type, Field]]:
         required_keys = required_keys or []
 
