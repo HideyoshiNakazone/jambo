@@ -1,12 +1,14 @@
 from jambo.parser._type_parser import GenericTypeParser
 
+from typing import ClassVar
+
 
 class IntTypeParser(GenericTypeParser):
     mapped_type = int
 
     json_schema_type = "type:integer"
 
-    type_mappings = {
+    type_mappings: ClassVar[dict[str, str]] = {  # type: ignore
         "minimum": "ge",
         "exclusiveMinimum": "gt",
         "maximum": "le",

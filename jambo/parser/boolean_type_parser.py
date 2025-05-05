@@ -1,12 +1,14 @@
 from jambo.parser._type_parser import GenericTypeParser
 
+from typing import ClassVar
+
 
 class BooleanTypeParser(GenericTypeParser):
     mapped_type = bool
 
     json_schema_type = "type:boolean"
 
-    type_mappings = {
+    type_mappings: ClassVar[dict[str, str]] = {  # type: ignore
         "default": "default",
     }
 

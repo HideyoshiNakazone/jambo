@@ -13,12 +13,12 @@ from .string_type_parser import StringTypeParser
 
 
 __all__ = [
-    "GenericTypeParser",
     "AllOfTypeParser",
     "AnyOfTypeParser",
     "ArrayTypeParser",
     "BooleanTypeParser",
     "FloatTypeParser",
+    "GenericTypeParser",
     "IntTypeParser",
     "ObjectTypeParser",
     "StringTypeParser",

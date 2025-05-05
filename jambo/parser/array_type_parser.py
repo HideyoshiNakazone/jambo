@@ -1,7 +1,7 @@
 from jambo.parser._type_parser import GenericTypeParser
 
 import copy
-from typing import TypeVar
+from typing import ClassVar, TypeVar
 
 
 V = TypeVar("V")
@@ -12,9 +12,9 @@ class ArrayTypeParser(GenericTypeParser):
 
     json_schema_type = "type:array"
 
-    default_mappings = {"description": "description"}
+    default_mappings: ClassVar[dict[str, str]] = {"description": "description"}
 
-    type_mappings = {
+    type_mappings: ClassVar[dict[str, str]] = {  # type: ignore
         "maxItems": "max_length",
         "minItems": "min_length",
     }

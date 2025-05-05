@@ -1,10 +1,10 @@
 from jambo.types.json_schema_type import JSONSchema
 
 from pydantic import Field, TypeAdapter
-from typing_extensions import Annotated, Self, Unpack
+from typing_extensions import Self, Unpack
 
 from abc import ABC, abstractmethod
-from typing import Generic, NotRequired, Optional, TypedDict, TypeVar
+from typing import Annotated, Any, ClassVar, Generic, NotRequired, TypedDict, TypeVar
 
 
 T = TypeVar("T")
@@ -20,20 +20,20 @@ class TypeParserOptions(TypedDict):
 
 
 class GenericTypeParser(ABC, Generic[T]):
-    json_schema_type: str = None
+    json_schema_type: str
 
-    default_mappings = {
+    type_mappings: dict[str, str]
+
+    default_mappings: ClassVar[dict[str, str]] = {
         "default": "default",
         "description": "description",
     }
-
-    type_mappings: dict[str, str] = None
 
     @classmethod
     def type_from_properties(
         cls,
         name: str,
-        properties: dict[str, any],
+        properties: dict[str, Any],
         /,
         **kwargs: Unpack[TypeParserOptions],
     ) -> tuple[T, dict]:
@@ -55,7 +55,7 @@ class GenericTypeParser(ABC, Generic[T]):
         raise ValueError("Unknown type")
 
     @classmethod
-    def _get_schema_type(cls) -> tuple[str, Optional[str]]:
+    def _get_schema_type(cls) -> tuple[str, str | None]:
         if cls.json_schema_type is None:
             raise RuntimeError("TypeParser: json_schema_type not defined")
 
@@ -70,12 +70,12 @@ class GenericTypeParser(ABC, Generic[T]):
     def from_properties(
         self,
         name: str,
-        properties: dict[str, any],
+        properties: dict[str, Any],
         /,
         **kwargs: Unpack[TypeParserOptions],
     ) -> tuple[T, dict]: ...
 
-    def mappings_properties_builder(self, properties, required=False) -> dict[str, any]:
+    def mappings_properties_builder(self, properties, required=False) -> dict[str, Any]:
         if self.type_mappings is None:
             raise NotImplementedError("Type mappings not defined")
 

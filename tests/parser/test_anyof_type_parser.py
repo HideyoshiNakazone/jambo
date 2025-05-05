@@ -1,8 +1,6 @@
 from jambo.parser.anyof_type_parser import AnyOfTypeParser
 
-from typing_extensions import Annotated
-
-from typing import Union, get_args, get_origin
+from typing import Annotated, Union, get_args, get_origin
 from unittest import TestCase
 
 
@@ -85,7 +83,8 @@ class TestAnyOfTypeParser(TestCase):
 
     def test_any_string_or_int_with_invalid_defaults(self):
         """
-        Tests the AnyOfTypeParser with a string or int type and an invalid default value.
+        Tests the AnyOfTypeParser with a string or
+        int type and an invalid default value.
         """
 
         properties = {

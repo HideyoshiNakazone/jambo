@@ -66,8 +66,23 @@ omit = [
 
 
 # Linters
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+
+
 [tool.ruff.lint]
-extend-select = ["I"]
+select = [
+  "E",  # pycodestyle (errors)
+  "F",  # pyflakes
+  "I",  # isort (import sorting)
+  "B",  # flake8-bugbear (common bugs and performance issues)
+  "UP", # pyupgrade (automatically upgrade syntax for newer Python versions)
+  "SIM",# flake8-simplify (simplify code)
+  "C4", # flake8-comprehensions (improve comprehensions)
+  "RUF" # Ruff-specific rules
+]
+
 
 [tool.ruff.lint.isort]
 known-first-party = ["jambo"]

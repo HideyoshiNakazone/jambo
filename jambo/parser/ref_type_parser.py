@@ -1,6 +1,6 @@
 from jambo.parser._type_parser import GenericTypeParser
 
-from typing import ForwardRef, Union
+from typing import ClassVar, ForwardRef
 
 
 class RefTypeParser(GenericTypeParser):
@@ -8,11 +8,11 @@ class RefTypeParser(GenericTypeParser):
 
     json_schema_type = "$ref"
 
-    type_mappings = {}
+    type_mappings: ClassVar[dict[str, str]] = {}  # type: ignore
 
     def from_properties(
         self, properties, name, context, required=False, **kwargs
-    ) -> tuple[Union[type, ForwardRef], dict]:
+    ) -> tuple[type | ForwardRef, dict]:
         if "$ref" not in properties:
             raise ValueError(f"RefTypeParser: Missing $ref in properties for {name}")
 
@@ -23,11 +23,12 @@ class RefTypeParser(GenericTypeParser):
 
         if not properties["$ref"].startswith("#"):
             raise ValueError(
-                "At the moment, only local references are supported. Look into $defs and # for recursive references."
+                "At the moment, only local references are supported. "
+                "Look into $defs and # for recursive references."
             )
 
         ref_type = None
-        mapped_properties = dict()
+        mapped_properties = {}
 
         if properties["$ref"] == "#":
             if "title" not in context:
@@ -42,7 +43,8 @@ class RefTypeParser(GenericTypeParser):
             for prop_name in properties["$ref"].split("/")[1:]:
                 if prop_name not in target_property:
                     raise ValueError(
-                        f"RefTypeParser: Missing {prop_name} in properties for $ref {properties['$ref']}"
+                        f"RefTypeParser: Missing {prop_name} in"
+                        " properties for $ref {properties['$ref']}"
                     )
                 target_property = target_property[prop_name]
 
@@ -52,7 +54,8 @@ class RefTypeParser(GenericTypeParser):
 
         else:
             raise ValueError(
-                "RefTypeParser: Invalid $ref format. Only local references are supported."
+                "RefTypeParser: Invalid $ref format. "
+                "Only local references are supported."
             )
 
         if not required:

@@ -221,7 +221,7 @@ class TestAllOfTypeParser(TestCase):
         type_parsing, _ = AllOfTypeParser().from_properties("placeholder", properties)
 
         self.assertEqual(
-            type_parsing.schema()["properties"]["name"]["description"],
+            type_parsing.model_json_schema()["properties"]["name"]["description"],
             "One | Of | Us",
         )
 

@@ -1,9 +1,8 @@
 from jambo.parser._type_parser import GenericTypeParser
 
 from pydantic import Field
-from typing_extensions import Annotated
 
-from typing import Union
+from typing import Annotated, Union
 
 
 class AnyOfTypeParser(GenericTypeParser):
@@ -18,7 +17,7 @@ class AnyOfTypeParser(GenericTypeParser):
         if not isinstance(properties["anyOf"], list):
             raise ValueError(f"Invalid JSON Schema: {properties['anyOf']}")
 
-        mapped_properties = dict()
+        mapped_properties = {}
 
         subProperties = properties["anyOf"]
 
@@ -39,7 +38,8 @@ class AnyOfTypeParser(GenericTypeParser):
                     continue
             else:
                 raise ValueError(
-                    f"Invalid default value {default_value} for anyOf types: {sub_types}"
+                    f"Invalid default value {default_value} "
+                    "for anyOf types: {sub_types}"
                 )
 
             mapped_properties["default"] = default_value
