@@ -23,6 +23,7 @@ readme = "README.md"
 
 # Project Dependencies
 dependencies = [
+    "email-validator>=2.2.0",
     "jsonschema>=4.23.0",
     "pydantic>=2.10.6",
 ]

@@ -11,7 +11,7 @@ class RefTypeParser(GenericTypeParser):
     type_mappings: ClassVar[dict[str, str]] = {}  # type: ignore
 
     def from_properties(
-        self, properties, name, context, required=False, **kwargs
+        self, name, properties, context, required=False, **kwargs
     ) -> tuple[type | ForwardRef, dict]:
         if "$ref" not in properties:
             raise ValueError(f"RefTypeParser: Missing $ref in properties for {name}")
@@ -39,6 +39,7 @@ class RefTypeParser(GenericTypeParser):
             ref_type = ForwardRef(context["title"])
 
         elif properties["$ref"].startswith("#/$defs/"):
+            target_name = None
             target_property = context
             for prop_name in properties["$ref"].split("/")[1:]:
                 if prop_name not in target_property:
@@ -46,10 +47,16 @@ class RefTypeParser(GenericTypeParser):
                         f"RefTypeParser: Missing {prop_name} in"
                         " properties for $ref {properties['$ref']}"
                     )
+                target_name = prop_name
                 target_property = target_property[prop_name]
 
+            if target_name is None or target_property is None:
+                raise ValueError(
+                    f"RefTypeParser: Invalid $ref {properties['$ref']}"
+                )
+
             ref_type, mapped_properties = GenericTypeParser.type_from_properties(
-                prop_name, target_property, context=context, **kwargs
+                target_name, target_property, context=context, **kwargs
             )
 
         else:

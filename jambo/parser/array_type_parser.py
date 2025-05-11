@@ -20,8 +20,9 @@ class ArrayTypeParser(GenericTypeParser):
     }
 
     def from_properties(self, name, properties, required=False, **kwargs):
+        kwargs["required"] = True
         _item_type, _item_args = GenericTypeParser.type_from_properties(
-            name, properties["items"], required=True
+            name, properties["items"], **kwargs
         )
 
         wrapper_type = set if properties.get("uniqueItems", False) else list

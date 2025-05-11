@@ -63,10 +63,10 @@ class SchemaConverter:
 
     @staticmethod
     def _parse_properties(
-        properties: dict, root_properties=None, required_keys=None, **kwargs
+        properties: dict, context=None, required_keys=None, **kwargs
     ) -> dict[str, tuple[type, Field]]:
-        if root_properties is None:
-            root_properties = {}
+        if context is None:
+            context = properties
         required_keys = required_keys or []
 
         fields = {}
@@ -76,8 +76,8 @@ class SchemaConverter:
             field_type, field_validators = GenericTypeParser.type_from_properties(
                 name,
                 prop,
+                context=context,
                 required=is_field_required,
-                context=root_properties,
             )
             fields[name] = (field_type, Field(**field_validators))
 

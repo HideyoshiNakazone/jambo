@@ -34,7 +34,6 @@ class GenericTypeParser(ABC, Generic[T]):
         cls,
         name: str,
         properties: dict[str, Any],
-        /,
         **kwargs: Unpack[TypeParserOptions],
     ) -> tuple[T, dict]:
         parser = cls._get_impl(properties)
@@ -71,12 +70,11 @@ class GenericTypeParser(ABC, Generic[T]):
         self,
         name: str,
         properties: dict[str, Any],
-        /,
         **kwargs: Unpack[TypeParserOptions],
     ) -> tuple[T, dict]: ...
 
     def mappings_properties_builder(self, properties, required=False) -> dict[str, Any]:
-        if self.type_mappings is None:
+        if getattr(self, "type_mappings", None) is None:
             raise NotImplementedError("Type mappings not defined")
 
         if not required:
