@@ -1,7 +1,8 @@
 from jambo import SchemaConverter
 
-from pydantic import BaseModel
+from pydantic import BaseModel, HttpUrl
 
+from ipaddress import IPv4Address, IPv6Address
 from unittest import TestCase
 
 
@@ -397,3 +398,99 @@ class TestSchemaConverter(TestCase):
 
         with self.assertRaises(ValueError):
             Model(id=11)
+
+    def test_string_format_email(self):
+        schema = {
+            "title": "EmailTest",
+            "type": "object",
+            "properties": {"email": {"type": "string", "format": "email"}},
+        }
+        model = SchemaConverter.build(schema)
+        self.assertEqual(model(email="test@example.com").email, "test@example.com")
+        with self.assertRaises(ValueError):
+            model(email="invalid-email")
+
+    def test_string_format_uri(self):
+        schema = {
+            "title": "UriTest",
+            "type": "object",
+            "properties": {"website": {"type": "string", "format": "uri"}},
+        }
+        model = SchemaConverter.build(schema)
+        self.assertEqual(
+            model(website="https://example.com").website, HttpUrl("https://example.com")
+        )
+        with self.assertRaises(ValueError):
+            model(website="invalid-uri")
+
+    def test_string_format_ipv4(self):
+        schema = {
+            "title": "IPv4Test",
+            "type": "object",
+            "properties": {"ip": {"type": "string", "format": "ipv4"}},
+        }
+        model = SchemaConverter.build(schema)
+        self.assertEqual(model(ip="192.168.1.1").ip, IPv4Address("192.168.1.1"))
+        with self.assertRaises(ValueError):
+            model(ip="256.256.256.256")
+
+    def test_string_format_ipv6(self):
+        schema = {
+            "title": "IPv6Test",
+            "type": "object",
+            "properties": {"ip": {"type": "string", "format": "ipv6"}},
+        }
+        model = SchemaConverter.build(schema)
+        self.assertEqual(
+            model(ip="2001:0db8:85a3:0000:0000:8a2e:0370:7334").ip,
+            IPv6Address("2001:0db8:85a3:0000:0000:8a2e:0370:7334"),
+        )
+        with self.assertRaises(ValueError):
+            model(ip="invalid-ipv6")
+
+    def test_string_format_hostname(self):
+        schema = {
+            "title": "HostnameTest",
+            "type": "object",
+            "properties": {"hostname": {"type": "string", "format": "hostname"}},
+        }
+        model = SchemaConverter.build(schema)
+        self.assertEqual(model(hostname="example.com").hostname, "example.com")
+        with self.assertRaises(ValueError):
+            model(hostname="invalid..hostname")
+
+    def test_string_format_datetime(self):
+        schema = {
+            "title": "DateTimeTest",
+            "type": "object",
+            "properties": {"timestamp": {"type": "string", "format": "date-time"}},
+        }
+        model = SchemaConverter.build(schema)
+        self.assertEqual(
+            model(timestamp="2024-01-01T12:00:00Z").timestamp.isoformat(),
+            "2024-01-01T12:00:00+00:00",
+        )
+        with self.assertRaises(ValueError):
+            model(timestamp="invalid-datetime")
+
+    def test_string_format_time(self):
+        schema = {
+            "title": "TimeTest",
+            "type": "object",
+            "properties": {"time": {"type": "string", "format": "time"}},
+        }
+        model = SchemaConverter.build(schema)
+        self.assertEqual(
+            model(time="20:20:39+00:00").time.isoformat(), "20:20:39+00:00"
+        )
+        with self.assertRaises(ValueError):
+            model(time="25:00:00")
+
+    def test_string_format_unsupported(self):
+        schema = {
+            "title": "InvalidFormat",
+            "type": "object",
+            "properties": {"field": {"type": "string", "format": "unsupported"}},
+        }
+        with self.assertRaises(ValueError):
+            SchemaConverter.build(schema)
