@@ -12,9 +12,10 @@ class SchemaConverter:
     """
     Converts JSON Schema to Pydantic models.
 
-    This class is responsible for converting JSON Schema definitions into Pydantic models.
-    It validates the schema and generates the corresponding Pydantic model with appropriate
-    fields and types. The generated model can be used for data validation and serialization.
+    This class is responsible for converting JSON Schema definitions
+    into Pydantic models.  It validates the schema and generates
+    the corresponding Pydantic model with appropriate fields and types.
+    The generated model can be used for data validation and serialization.
     """
 
     @staticmethod
@@ -45,11 +46,11 @@ class SchemaConverter:
             validator = validator_for(schema)
             validator.check_schema(schema)
         except SchemaError as e:
-            raise ValueError(f"Invalid JSON Schema: {e}")
+            raise ValueError(f"Invalid JSON Schema: {e}") from e
 
         if schema["type"] != "object":
             raise TypeError(
-                f"Invalid JSON Schema: {schema['type']}. Only 'object' can be converted to Pydantic models."
+                f"Invalid JSON Schema: {schema['type']}. Only 'object' can be converted to Pydantic models."  # noqa: E501
             )
 
         return SchemaConverter._build_model_from_properties(

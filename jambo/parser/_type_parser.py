@@ -1,15 +1,15 @@
 from pydantic import Field, TypeAdapter
-from typing_extensions import Annotated, Self
+from typing_extensions import Self
 
 from abc import ABC, abstractmethod
-from typing import Generic, Type, TypeVar
+from typing import Annotated, Generic, TypeVar
 
 
 T = TypeVar("T")
 
 
 class GenericTypeParser(ABC, Generic[T]):
-    mapped_type: Type[T] = None
+    mapped_type: type[T] = None
 
     json_schema_type: str = None
 

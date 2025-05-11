@@ -19,12 +19,13 @@ class AllOfTypeParser(GenericTypeParser):
             raise ValueError("Invalid JSON Schema: 'type' is not specified.")
 
         if any(
-            [prop.get("type", _mapped_type) != _mapped_type for prop in subProperties]
+            prop.get("type", _mapped_type) != _mapped_type for prop in subProperties
         ):
             raise ValueError("Invalid JSON Schema: allOf types do not match.")
 
         for subProperty in subProperties:
-            # If a sub-property has not defined a type, we need to set it to the top-level type
+            # If a sub-property has not defined a type,
+            # we need to set it to the top-level type
             subProperty["type"] = _mapped_type
 
         combined_properties = self._rebuild_properties_from_subproperties(subProperties)
