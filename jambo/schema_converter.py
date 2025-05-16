@@ -4,7 +4,7 @@ from jambo.types.json_schema_type import JSONSchema
 from jsonschema.exceptions import SchemaError
 from jsonschema.validators import validator_for
 from pydantic import create_model
-from pydantic.fields import Field
+from pydantic.fields import Field, FieldInfo
 from pydantic.main import ModelT
 
 
@@ -19,7 +19,7 @@ class SchemaConverter:
     """
 
     @staticmethod
-    def build(schema: JSONSchema) -> ModelT:
+    def build(schema: JSONSchema) -> type[ModelT]:
         """
         Converts a JSON Schema to a Pydantic model.
         :param schema: The JSON Schema to convert.
@@ -34,7 +34,7 @@ class SchemaConverter:
     def build_object(
         name: str,
         schema: JSONSchema,
-    ) -> ModelT:
+    ) -> type[ModelT]:
         """
         Converts a JSON Schema object to a Pydantic model given a name.
         :param name:
@@ -60,7 +60,7 @@ class SchemaConverter:
     @staticmethod
     def _build_model_from_properties(
         model_name: str, model_properties: dict, required_keys: list[str]
-    ) -> ModelT:
+    ) -> type[ModelT]:
         properties = SchemaConverter._parse_properties(model_properties, required_keys)
 
         return create_model(model_name, **properties)
@@ -68,30 +68,17 @@ class SchemaConverter:
     @staticmethod
     def _parse_properties(
         properties: dict, required_keys=None
-    ) -> dict[str, tuple[type, Field]]:
+    ) -> dict[str, tuple[type, FieldInfo]]:
         required_keys = required_keys or []
 
         fields = {}
         for name, prop in properties.items():
             is_required = name in required_keys
-            fields[name] = SchemaConverter._build_field(name, prop, is_required)
+
+            field_type, field_args = GenericTypeParser.type_from_properties(
+                name, prop, required=is_required
+            )
+
+            fields[name] = (field_type, Field(**field_args))
 
         return fields
-
-    @staticmethod
-    def _build_field(name, properties: dict, required=False) -> tuple[type, Field]:
-        match properties:
-            case {"anyOf": _}:
-                _field_type = "anyOf"
-            case {"allOf": _}:
-                _field_type = "allOf"
-            case {"type": _}:
-                _field_type = properties["type"]
-            case _:
-                raise ValueError(f"Invalid JSON Schema: {properties}")
-
-        _field_type, _field_args = GenericTypeParser.get_impl(
-            _field_type
-        ).from_properties(name, properties, required)
-
-        return _field_type, Field(**_field_args)

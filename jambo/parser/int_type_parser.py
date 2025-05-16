@@ -4,7 +4,7 @@ from jambo.parser._type_parser import GenericTypeParser
 class IntTypeParser(GenericTypeParser):
     mapped_type = int
 
-    json_schema_type = "integer"
+    json_schema_type = "type:integer"
 
     type_mappings = {
         "minimum": "ge",

@@ -8,7 +8,7 @@ from datetime import date, datetime, time
 class StringTypeParser(GenericTypeParser):
     mapped_type = str
 
-    json_schema_type = "string"
+    json_schema_type = "type:string"
 
     type_mappings = {
         "maxLength": "max_length",

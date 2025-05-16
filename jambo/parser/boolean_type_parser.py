@@ -4,7 +4,7 @@ from jambo.parser._type_parser import GenericTypeParser
 class BooleanTypeParser(GenericTypeParser):
     mapped_type = bool
 
-    json_schema_type = "boolean"
+    json_schema_type = "type:boolean"
 
     type_mappings = {
         "default": "default",

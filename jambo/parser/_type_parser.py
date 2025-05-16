@@ -1,43 +1,65 @@
 from pydantic import Field, TypeAdapter
-from typing_extensions import Self
+from typing_extensions import Any, Self
 
 from abc import ABC, abstractmethod
-from typing import Annotated, Generic, TypeVar
+from typing import Annotated, ClassVar, Generic, TypeVar
 
 
 T = TypeVar("T")
 
 
 class GenericTypeParser(ABC, Generic[T]):
-    mapped_type: type[T] = None
+    mapped_type: type[T]
 
-    json_schema_type: str = None
+    json_schema_type: str
 
-    default_mappings = {
+    type_mappings: dict[str, str]
+
+    default_mappings: ClassVar[dict[str, str]] = {
         "default": "default",
         "description": "description",
     }
 
-    type_mappings: dict[str, str] = None
+    @classmethod
+    def type_from_properties(
+        cls, name: str, properties: dict[str, Any], /, **kwargs
+    ) -> tuple[T, dict]:
+        parser = cls._get_impl(properties)
+
+        return parser.from_properties(name, properties, **kwargs)
 
     @classmethod
-    def get_impl(cls, type_name: str) -> Self:
+    def _get_impl(cls, properties: dict) -> Self:
         for subcls in cls.__subclasses__():
-            if subcls.json_schema_type is None:
-                raise RuntimeError(f"Unknown type: {type_name}")
+            schema_type, schema_value = subcls._get_schema_type()
 
-            if subcls.json_schema_type == type_name:
+            if schema_type not in properties:
+                continue
+
+            if schema_value is None or schema_value == properties[schema_type]:
                 return subcls()
 
-        raise ValueError(f"Unknown type: {type_name}")
+        raise ValueError("Unknown type")
+
+    @classmethod
+    def _get_schema_type(cls) -> tuple[str, str | None]:
+        if cls.json_schema_type is None:
+            raise RuntimeError("TypeParser: json_schema_type not defined")
+
+        schema_definition = cls.json_schema_type.split(":")
+
+        if len(schema_definition) == 1:
+            return schema_definition[0], None
+
+        return schema_definition[0], schema_definition[1]
 
     @abstractmethod
     def from_properties(
-        self, name: str, properties: dict[str, any], required: bool = False
+        self, name: str, properties: dict[str, Any], required: bool = False
     ) -> tuple[T, dict]: ...
 
-    def mappings_properties_builder(self, properties, required=False) -> dict[str, any]:
-        if self.type_mappings is None:
+    def mappings_properties_builder(self, properties, required=False) -> dict[str, Any]:
+        if getattr(self, "type_mappings", None) is None:
             raise NotImplementedError("Type mappings not defined")
 
         if not required:

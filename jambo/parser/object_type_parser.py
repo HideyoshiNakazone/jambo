@@ -4,7 +4,7 @@ from jambo.parser._type_parser import GenericTypeParser
 class ObjectTypeParser(GenericTypeParser):
     mapped_type = object
 
-    json_schema_type = "object"
+    json_schema_type = "type:object"
 
     @staticmethod
     def from_properties(name, properties, required=False):

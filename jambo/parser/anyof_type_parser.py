@@ -22,9 +22,7 @@ class AnyOfTypeParser(GenericTypeParser):
         subProperties = properties["anyOf"]
 
         sub_types = [
-            GenericTypeParser.get_impl(subProperty["type"]).from_properties(
-                name, subProperty
-            )
+            GenericTypeParser.type_from_properties(name, subProperty)
             for subProperty in subProperties
         ]
 
