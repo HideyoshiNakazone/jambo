@@ -33,7 +33,7 @@ class GenericTypeParser(ABC, Generic[T]):
 
     def from_properties(
         self, name: str, properties: dict[str, Any], **kwargs: Unpack[TypeParserOptions]
-    ) -> tuple[type, dict]:
+    ) -> tuple[T, dict]:
         """
         Converts properties to a type and its fields properties.
         :param name: The name of the type.

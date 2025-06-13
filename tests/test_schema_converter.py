@@ -496,3 +496,69 @@ class TestSchemaConverter(TestCase):
         }
         with self.assertRaises(ValueError):
             SchemaConverter.build(schema)
+
+    def test_ref_with_root_ref(self):
+        schema = {
+            "title": "Person",
+            "type": "object",
+            "properties": {
+                "name": {"type": "string"},
+                "age": {"type": "integer"},
+                "emergency_contact": {
+                    "$ref": "#",
+                },
+            },
+            "required": ["name", "age"],
+        }
+
+        model = SchemaConverter.build(schema)
+
+        obj = model(
+            name="John",
+            age=30,
+            emergency_contact=model(
+                name="Jane",
+                age=28,
+            ),
+        )
+
+        self.assertEqual(obj.name, "John")
+        self.assertEqual(obj.age, 30)
+        self.assertIsInstance(obj.emergency_contact, model)
+        self.assertEqual(obj.emergency_contact.name, "Jane")
+        self.assertEqual(obj.emergency_contact.age, 28)
+
+    def test_ref_with_def(self):
+        schema = {
+            "title": "person",
+            "$ref": "#/$defs/person",
+            "$defs": {
+                "person": {
+                    "type": "object",
+                    "properties": {
+                        "name": {"type": "string"},
+                        "age": {"type": "integer"},
+                        "emergency_contact": {
+                            "$ref": "#/$defs/person",
+                        },
+                    },
+                }
+            },
+        }
+
+        model = SchemaConverter.build(schema)
+
+        obj = model(
+            name="John",
+            age=30,
+            emergency_contact=model(
+                name="Jane",
+                age=28,
+            ),
+        )
+
+        self.assertEqual(obj.name, "John")
+        self.assertEqual(obj.age, 30)
+        self.assertIsInstance(obj.emergency_contact, model)
+        self.assertEqual(obj.emergency_contact.name, "Jane")
+        self.assertEqual(obj.emergency_contact.age, 28)

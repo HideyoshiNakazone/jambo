@@ -1,8 +1,7 @@
 from jambo.parser._type_parser import GenericTypeParser
 from jambo.types.type_parser_options import TypeParserOptions
 
-from pydantic import Field, create_model
-from pydantic.main import ModelT
+from pydantic import BaseModel, Field, create_model
 from typing_extensions import Any, Unpack
 
 
@@ -13,7 +12,7 @@ class ObjectTypeParser(GenericTypeParser):
 
     def from_properties_impl(
         self, name: str, properties: dict[str, Any], **kwargs: Unpack[TypeParserOptions]
-    ):
+    ) -> tuple[type[BaseModel], dict]:
         type_parsing = self.to_model(
             name,
             properties.get("properties", {}),
@@ -29,13 +28,14 @@ class ObjectTypeParser(GenericTypeParser):
 
         return type_parsing, type_properties
 
+    @classmethod
     def to_model(
-        self,
+        cls,
         name: str,
         schema: dict[str, Any],
         required_keys: list[str],
         **kwargs: Unpack[TypeParserOptions],
-    ) -> type[ModelT]:
+    ) -> type[BaseModel]:
         """
         Converts JSON Schema object properties to a Pydantic model.
         :param name: The name of the model.
@@ -43,11 +43,12 @@ class ObjectTypeParser(GenericTypeParser):
         :param required_keys: List of required keys in the schema.
         :return: A Pydantic model class.
         """
-        fields = self._parse_properties(schema, required_keys, **kwargs)
+        fields = cls._parse_properties(schema, required_keys, **kwargs)
         return create_model(name, **fields)
 
-    @staticmethod
+    @classmethod
     def _parse_properties(
+        cls,
         properties: dict[str, Any],
         required_keys: list[str],
         **kwargs: Unpack[TypeParserOptions],

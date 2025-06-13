@@ -9,6 +9,7 @@ from .boolean_type_parser import BooleanTypeParser
 from .float_type_parser import FloatTypeParser
 from .int_type_parser import IntTypeParser
 from .object_type_parser import ObjectTypeParser
+from .ref_type_parser import RefTypeParser
 from .string_type_parser import StringTypeParser
 
 
@@ -22,4 +23,5 @@ __all__ = [
     "IntTypeParser",
     "ObjectTypeParser",
     "StringTypeParser",
+    "RefTypeParser",
 ]
