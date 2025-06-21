@@ -12,8 +12,9 @@ build:
       - uv sync
 
     build:
-      - cd docs
-      - make html
+      html:
+        - cd docs
+        - make html
 
 sphinx:
   configuration: docs/source/conf.py
