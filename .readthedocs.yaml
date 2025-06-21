@@ -7,8 +7,10 @@ build:
 
   jobs:
     pre_build:
-      - curl -Ls https://astral.sh/uv/install.sh | sh
-      - export PATH="$HOME/.cargo/bin:$PATH"
+      - asdf plugin add uv
+      - asdf install uv latest
+      - asdf global uv latest
+      - uv venv $READTHEDOCS_VIRTUALENV_PATH
       - uv sync
 
     build:
