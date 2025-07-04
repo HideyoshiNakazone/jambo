@@ -97,3 +97,18 @@ class TestArrayTypeParser(TestCase):
 
         with self.assertRaises(ValueError):
             parser.from_properties("placeholder", properties)
+
+    def test_array_parser_required_without_default(self):
+        """Regression test: Required array fields without defaults should be required"""
+        parser = ArrayTypeParser()
+
+        properties = {"items": {"type": "string"}}
+
+        # Test with required=True (should be required)
+        type_parsing, type_validator = parser.from_properties(
+            "test_array", properties, required=True
+        )
+
+        # Should NOT have default_factory when required and no default specified
+        self.assertNotIn("default_factory", type_validator)
+        self.assertNotIn("default", type_validator)

@@ -358,10 +358,13 @@ class TestSchemaConverter(TestCase):
         Model = SchemaConverter.build(schema)
 
         obj = Model(
-            name="J",
+            name="John",
         )
 
-        self.assertEqual(obj.name, "J")
+        self.assertEqual(obj.name, "John")
+
+        with self.assertRaises(ValueError):
+            Model(name="J")
 
         with self.assertRaises(ValueError):
             Model(name="John Invalid")

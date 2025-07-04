@@ -117,8 +117,8 @@ class TestAllOfTypeParser(TestCase):
         )
 
         self.assertEqual(type_parsing, str)
-        self.assertEqual(type_validator["max_length"], 11)
-        self.assertEqual(type_validator["min_length"], 1)
+        self.assertEqual(type_validator["max_length"], 4)
+        self.assertEqual(type_validator["min_length"], 2)
 
     def test_all_of_type_parser_in_fields(self):
         """
@@ -138,8 +138,8 @@ class TestAllOfTypeParser(TestCase):
         )
 
         self.assertEqual(type_parsing, str)
-        self.assertEqual(type_validator["max_length"], 11)
-        self.assertEqual(type_validator["min_length"], 1)
+        self.assertEqual(type_validator["max_length"], 4)
+        self.assertEqual(type_validator["min_length"], 2)
 
     def test_invalid_all_of(self):
         """

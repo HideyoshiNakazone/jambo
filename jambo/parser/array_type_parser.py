@@ -35,10 +35,18 @@ class ArrayTypeParser(GenericTypeParser):
 
         mapped_properties = self.mappings_properties_builder(properties, **kwargs)
 
-        if "default" not in mapped_properties:
+        # Only set default_factory if the field is not required OR if there's an actual default
+        if not kwargs.get("required", False) and "default" not in mapped_properties:
             mapped_properties["default_factory"] = self._build_default_factory(
                 properties.get("default"), wrapper_type
             )
+        elif "default" in properties:
+            # If there's a default value specified, set the default_factory
+            mapped_properties["default_factory"] = self._build_default_factory(
+                properties["default"], wrapper_type
+            )
+            # Remove the regular default since we're using default_factory
+            mapped_properties.pop("default", None)
 
         return field_type, mapped_properties
 

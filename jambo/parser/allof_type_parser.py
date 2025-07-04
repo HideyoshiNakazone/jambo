@@ -74,10 +74,10 @@ class AllOfTypeParser(GenericTypeParser):
             return old_value + new_value
 
         if prop_name in ("maxLength", "maximum", "exclusiveMaximum"):
-            return old_value if old_value > new_value else new_value
+            return old_value if old_value < new_value else new_value
 
         if prop_name in ("minLength", "minimum", "exclusiveMinimum"):
-            return old_value if old_value < new_value else new_value
+            return old_value if old_value > new_value else new_value
 
         if prop_name == "properties":
             for key, value in new_value.items():

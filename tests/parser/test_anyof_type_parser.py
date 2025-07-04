@@ -46,11 +46,8 @@ class TestAnyOfTypeParser(TestCase):
 
         type_1, type_2 = get_args(type_parsing)
 
-        self.assertEqual(get_origin(type_1), Annotated)
-        self.assertIn(str, get_args(type_1))
-
-        self.assertEqual(get_origin(type_2), Annotated)
-        self.assertIn(int, get_args(type_2))
+        self.assertEqual(type_1, str)
+        self.assertEqual(type_2, int)
 
     def test_any_of_string_or_int_with_default(self):
         """
@@ -74,11 +71,8 @@ class TestAnyOfTypeParser(TestCase):
 
         type_1, type_2 = get_args(type_parsing)
 
-        self.assertEqual(get_origin(type_1), Annotated)
-        self.assertIn(str, get_args(type_1))
-
-        self.assertEqual(get_origin(type_2), Annotated)
-        self.assertIn(int, get_args(type_2))
+        self.assertEqual(type_1, str)
+        self.assertEqual(type_2, int)
 
         self.assertEqual(type_validator["default"], 42)
 
