@@ -32,7 +32,6 @@ dependencies = [
 dev = [
     "coverage>=7.8.0",
     "mypy>=1.18.1",
-    "poethepoet>=0.33.1",
     "pre-commit>=4.2.0",
     "ruff>=0.11.4",
     "sphinx>=8.1.3",
@@ -47,14 +46,6 @@ dev = [
 homepage = "https://github.com/HideyoshiNakazone/jambo"
 repository = "https://github.com/HideyoshiNakazone/jambo.git"
 
-
-# POE Tasks
-[tool.poe.tasks]
-create-hooks        = "bash .githooks/set-hooks.sh"
-tests               = "python -m coverage run -m unittest discover -v"
-tests-report        = "python -m coverage xml"
-type-check          = "mypy jambo"
-serve-docs          = "sphinx-autobuild docs/source docs/build"
 
 # Build System
 [tool.hatch.version]
