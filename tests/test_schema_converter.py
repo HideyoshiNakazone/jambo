@@ -785,7 +785,7 @@ class TestSchemaConverter(TestCase):
 
     def test_scoped_ref_schema(self):
         schema: JSONSchema = {
-            "title": "Example Schema",
+            "title": "ExampleSchema",
             "type": "object",
             "properties": {
                 "operating_system": {
@@ -1171,3 +1171,20 @@ class TestSchemaConverter(TestCase):
             "Person", namespace=namespace
         )
         self.assertIsNone(cleared_cached_model)
+
+    def test_raises_on_invalid_schema_name(self):
+        with self.assertRaises(ValueError) as ctx:
+            SchemaConverter.build(
+                {
+                    "title": "Test Schema",
+                    "type": "object",
+                    "properties": {
+                        "name": {"type": "string"},
+                    },
+                    "required": ["name"],
+                }
+            )
+        self.assertEqual(
+            str(ctx.exception),
+            "Invalid JSON Schema: Invalid title for the schema. Please use alphanumeric characters, hyphens and underscores only.",
+        )
