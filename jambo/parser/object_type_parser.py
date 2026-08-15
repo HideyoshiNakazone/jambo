@@ -16,6 +16,8 @@ class ObjectTypeParser(GenericTypeParser):
 
     json_schema_type = "type:object"
 
+    _valid_name_pattern = re.compile(r"^[a-zA-Z0-9_-]+(?:\.[a-zA-Z0-9_-]+)*$")
+
     def from_properties_impl(
         self, name: str, properties: JSONSchema, **kwargs: Unpack[TypeParserOptions]
     ) -> tuple[type[BaseModel], dict]:
@@ -60,9 +62,10 @@ class ObjectTypeParser(GenericTypeParser):
         :param required_keys: List of required keys in the schema.
         :return: A Pydantic model class.
         """
-        if not re.match(r"^[a-zA-Z0-9_-]+(?:\.[a-zA-Z0-9_-]+)*$", name):
+        if not cls._valid_name_pattern.match(name):
             raise InvalidSchemaException(
-                "Invalid title for the schema. Please use alphanumeric characters, hyphens and underscores only."
+                f"Invalid name '{name}' for the schema. Object titles and property names"
+                " must use alphanumeric characters, hyphens and underscores only."
             )
 
         ref_cache = kwargs.get("ref_cache")
