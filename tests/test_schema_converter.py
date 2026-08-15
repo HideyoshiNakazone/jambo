@@ -1186,5 +1186,7 @@ class TestSchemaConverter(TestCase):
             )
         self.assertEqual(
             str(ctx.exception),
-            "Invalid JSON Schema: Invalid title for the schema. Please use alphanumeric characters, hyphens and underscores only.",
+            "Invalid JSON Schema: Invalid name 'Test Schema' for the schema. "
+            "Object titles and property names must use alphanumeric characters, "
+            "hyphens and underscores only.",
         )
