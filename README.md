@@ -11,6 +11,7 @@
 <br />
 <a href="https://pypi.org/project/jambo" target="_blank">
     <img src="https://badge.fury.io/py/jambo.svg" alt="Package version">
+    <img src="https://static.pepy.tech/personalized-badge/jambo?period=total&units=INTERNATIONAL_SYSTEM&left_color=GREY&right_color=GREEN&left_text=downloads" alt="PyPI Downloads">
 </a>
 <a href="https://github.com/HideyoshiNakazone/jambo" target="_blank">
     <img src="https://img.shields.io/pypi/pyversions/jambo.svg" alt="Python versions">
