@@ -1172,6 +1172,27 @@ class TestSchemaConverter(TestCase):
         )
         self.assertIsNone(cleared_cached_model)
 
+    def test_clear_all_namespaces(self):
+        for namespace in ("namespace_a", "namespace_b"):
+            schema: JSONSchema = {
+                "$id": namespace,
+                "title": "Person",
+                "type": "object",
+                "properties": {"name": {"type": "string"}},
+                "required": ["name"],
+            }
+            self.converter.build_with_cache(schema)
+            self.assertIsNotNone(
+                self.converter.get_cached_ref("Person", namespace=namespace)
+            )
+
+        self.converter.clear_ref_cache(namespace=None)
+
+        for namespace in ("namespace_a", "namespace_b"):
+            self.assertIsNone(
+                self.converter.get_cached_ref("Person", namespace=namespace)
+            )
+
     def test_raises_on_invalid_schema_name(self):
         with self.assertRaises(ValueError) as ctx:
             SchemaConverter.build(
